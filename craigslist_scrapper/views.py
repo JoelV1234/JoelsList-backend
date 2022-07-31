@@ -57,5 +57,14 @@ def get_posting(request):
     return HttpResponse(json.dumps(posting_list))
 
 def get_search_suggestion(request):
-    query = request.GET.get('search_term')
-    
+    search_term = request.GET.get('search_term')
+    suggestions = requests.get(
+        url_config.CRAIGSLIST_SUGGESTIONS,
+        params={
+            'type' : 'search',
+            'term' : search_term,
+            'cat' : 'sss'
+        }
+    )
+    formatted_response = json.dumps(suggestions.text)
+    return HttpResponse(formatted_response)
