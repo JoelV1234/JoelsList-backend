@@ -44,10 +44,12 @@ def get_posting(request):
         location = item.find("span", class_="result-hood") 
         gallery= item.find("a", class_="result-image gallery")
         data_ids = get_data_ids(gallery)
-        images = []
-        for data_id in data_ids:
-            image = 'https://images.craigslist.org/' + data_id + '_300x300.jpg'
-            images.append(image)
+        images = ['https://www.scott-sports.com/_ui/responsive/common/images/no-product-image-available.png']
+        if len(data_ids) > 0:
+            images.pop()
+            for data_id in data_ids:
+                image = 'https://images.craigslist.org/' + data_id + '_300x300.jpg'
+                images.append(image)
         posting_list.append({
             'title' : get_text(title),
             'price' : get_text(price),
