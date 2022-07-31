@@ -3,7 +3,6 @@ import json
 from nis import cat
 from urllib import response
 from django.http import HttpResponse
-from jmespath import search
 import requests
 from bs4 import BeautifulSoup
 from .utils import get_text
@@ -67,4 +66,5 @@ def get_search_suggestion(request):
             'cat' : 'sss'
         }
     )
-    print(suggestions)
+    formatted_response = json.dumps(suggestions.text)
+    return HttpResponse(formatted_response)
