@@ -3,6 +3,7 @@ import json
 from nis import cat
 from urllib import response
 from django.http import HttpResponse
+from jmespath import search
 import requests
 from bs4 import BeautifulSoup
 from .utils import get_text
@@ -57,5 +58,13 @@ def get_posting(request):
     return HttpResponse(json.dumps(posting_list))
 
 def get_search_suggestion(request):
-    query = request.GET.get('search_term')
-    
+    search_term = request.GET.get('search_term')
+    suggestions = requests.get(
+        url_config.CRAIGSLIST_SUGGESTIONS,
+        params={
+            'type' : 'search',
+            'term' : search_term,
+            'cat' : 'sss'
+        }
+    )
+    print(suggestions)
