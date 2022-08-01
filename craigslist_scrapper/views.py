@@ -66,5 +66,4 @@ def get_search_suggestion(request):
             'cat' : 'sss'
         }
     )
-    formatted_response = json.dumps(suggestions.text)
-    return HttpResponse(formatted_response)
+    return HttpResponse(suggestions.text)
