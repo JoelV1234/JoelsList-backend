@@ -125,3 +125,9 @@ CORS_ORIGIN_ALLOW_ALL = True
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+SENDGRID_API_KEY = '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'
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'smtp.sendgrid.net'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'apikey'
+EMAIL_HOST_PASSWORD = SENDGRID_API_KEY
