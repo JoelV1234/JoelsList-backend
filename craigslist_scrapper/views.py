@@ -23,7 +23,7 @@ def get_data_ids(tag):
         return ''
 
 
-def get_posting(request):
+def get_postings(request):
     
     query = request.GET.get('query')
     posting_page = requests.get(
