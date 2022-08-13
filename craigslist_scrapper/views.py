@@ -7,6 +7,7 @@ import requests
 from bs4 import BeautifulSoup
 from .utils import get_text
 import craigslist_scrapper.url_config as url_config
+from django.views.decorators.csrf import csrf_exempt
 
 
 def index(request):
@@ -23,9 +24,13 @@ def get_data_ids(tag):
         return ''
 
 
+@csrf_exempt 
 def get_postings(request):
-    
     query = request.GET.get('query')
+    postings = get_all_postings(query)
+    return HttpResponse(json.dumps(postings))
+    
+def get_all_postings(query):
     posting_page = requests.get(
         url_config.CRAIGSLIST_SEARCH,
         params={
@@ -37,8 +42,10 @@ def get_postings(request):
     results = soup.find(id="search-results", class_="rows")
     posting_elements = results.find_all("li", class_="result-row")
     for item in posting_elements:
+        data_pid = item['data-pid']
         price = item.find("span", class_="result-price")
         title = item.find("a", class_="result-title hdrlnk") 
+        post_url = title['href']
         location = item.find("span", class_="result-hood") 
         gallery= item.find("a", class_="result-image gallery")
         data_ids = get_data_ids(gallery)
@@ -52,9 +59,11 @@ def get_postings(request):
             'title' : get_text(title),
             'price' : get_text(price),
             'location' : get_text(location),
-            'images' : images
+            'images' : images,
+            'post_url' : post_url,
+            'data_pid' : data_pid
         })
-    return HttpResponse(json.dumps(posting_list))
+    return posting_list
 
 def get_search_suggestion(request):
     search_term = request.GET.get('search_term')
@@ -67,3 +76,29 @@ def get_search_suggestion(request):
         }
     )
     return HttpResponse(suggestions.text)
+
+
+#Post method
+@csrf_exempt 
+def get_post(request):
+    data_pid = request.GET.get('data_pid')
+    postings = get_all_postings(data_pid)
+    post = {}
+
+    if len(postings) == 0:
+        return HttpResponse('post not found', status=404)
+    for card in postings:
+        if card['data_pid'] == data_pid:
+            post = card
+    
+    post_page = requests.get(post['post_url'])   
+    soup = BeautifulSoup(post_page.content, "html.parser")
+    print(soup)
+    post_body = soup.find_all("section", class_="body")[0]
+    description = post_body.find("section", id="postingbody")
+    time_stamps = post_body.find_all("time", class_="date timeago")
+    post['description'] = get_text(description)
+    post['posted_time'] = time_stamps[0]['datetime']
+    if len(time_stamps) > 1:
+        post['updated_time'] = time_stamps[1]['datetime']
+    return HttpResponse(json.dumps(post))

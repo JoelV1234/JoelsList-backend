@@ -2,4 +2,5 @@ turn def get_data_ids(): into regex it can be
 found in views.py in craigslist_scrapper
 =========================================================
 In production set CORS_ORIGIN_ALLOW_ALL to false 
+remove all csrf exempt in production
 and only point to your domain
