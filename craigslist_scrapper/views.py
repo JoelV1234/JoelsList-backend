@@ -36,6 +36,8 @@ def get_all_postings(query):
             'query' : query
         }
     )
+    print("=========")
+    print(posting_page.request.url)
     posting_list = []
     soup = BeautifulSoup(posting_page.content, "html.parser")
     results = soup.find(id="search-results", class_="rows")
@@ -49,7 +51,6 @@ def get_all_postings(query):
         gallery= item.find("a", class_="result-image gallery")
         data_ids = get_data_ids(gallery)
         images = [url_config.NO_IMAGE]
-        print(data_ids)
         if len(data_ids) > 0:
             images.pop()
             for data_id in data_ids:
@@ -95,7 +96,7 @@ def get_post(request):
     post_body = soup.find_all("section", class_="body")[0]
     description = post_body.find("section", id="postingbody")
     time_stamps = post_body.find_all("time", class_="date timeago")
-    post['description'] = get_text(description)
+    post['description'] = get_text(description).replace('QR Code Link to This Post', '')
     post['posted_time'] = time_stamps[0]['datetime']
     if len(time_stamps) > 1:
         post['updated_time'] = time_stamps[1]['datetime']
