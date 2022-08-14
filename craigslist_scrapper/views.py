@@ -13,12 +13,11 @@ from django.views.decorators.csrf import csrf_exempt
 def index(request):
     return HttpResponse("Hello, world. You're at the polls index.")
 
+
 def get_data_ids(tag):
-    tag = str(tag)
     try:
-        split_tag = tag.split("data-ids=")[1]
-        unforformatter_data_ids = split_tag.split(" ")[0][3:-1]
-        data_ids = unforformatter_data_ids.split(",")
+        split_tag = tag["data-ids"]
+        data_ids = split_tag.split(",")
         return data_ids
     except:
         return ''
@@ -50,10 +49,11 @@ def get_all_postings(query):
         gallery= item.find("a", class_="result-image gallery")
         data_ids = get_data_ids(gallery)
         images = [url_config.NO_IMAGE]
+        print(data_ids)
         if len(data_ids) > 0:
             images.pop()
             for data_id in data_ids:
-                image = url_config.CRAIGSLIST_IMAGES + data_id + '_300x300.jpg'
+                image = url_config.CRAIGSLIST_IMAGES + data_id[2:] + '_300x300.jpg'
                 images.append(image)
         posting_list.append({
             'title' : get_text(title),
@@ -90,10 +90,8 @@ def get_post(request):
     for card in postings:
         if card['data_pid'] == data_pid:
             post = card
-    
     post_page = requests.get(post['post_url'])   
     soup = BeautifulSoup(post_page.content, "html.parser")
-    print(soup)
     post_body = soup.find_all("section", class_="body")[0]
     description = post_body.find("section", id="postingbody")
     time_stamps = post_body.find_all("time", class_="date timeago")
